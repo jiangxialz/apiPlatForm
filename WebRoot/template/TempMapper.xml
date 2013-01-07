@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sharehome.platform.mapper.${className}Mapper" > 
+<!-- Result Map-->
+ <resultMap id="BaseResultMap" type="com.sharehome.platform.model.$!{className}" >
+ #foreach($item in $!{columnDatas})
+	<result column="$!item.columnName" property="$item.propertyName" javaType="$item.dataType"/>
+ #end
+ </resultMap>
+
+ <resultMap id="BaseResultMapBO" type="com.sharehome.platform.vo.${className}BO" extends="BaseResultMap">
+ </resultMap>
+       
+<!-- $!{tableName} table all fields -->
+<sql id="Base_Column_List" >
+	 $!{SQL.columnFields}
+</sql>
+
+<!-- 插入记录 -->
+<insert id="insert" parameterType="com.sharehome.platform.model.${className}" >
+  $!{SQL.insert}
+</insert>
+
+<!-- 根据id，修改记录-->  
+ <update id="update" parameterType="com.sharehome.platform.model.${className}" >
+  $!{SQL.update}
+ </update>
+ 
+<!-- ${codeName}列表 -->
+<select id="selectById"  resultMap="BaseResultMapBO" parameterType="java.lang.Long">
+	$!{SQL.selectById}
+</select>
+  	
+</mapper>   

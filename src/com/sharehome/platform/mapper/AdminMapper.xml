@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sharehome.platform.mapper.AdminMapper">
+	<!-- Result Map -->
+	<resultMap id="BaseResultMap" type="com.sharehome.platform.model.Admin">
+		<result column="id" property="id" javaType="Integer" />
+		<result column="login_name" property="loginName" javaType="String" />
+		<result column="name" property="name" javaType="String" />
+		<result column="password" property="password" javaType="String" />
+		<result column="status" property="status" javaType="Integer" />
+	</resultMap>
+
+	<resultMap id="BaseResultMapBO" type="com.sharehome.platform.vo.AdminBO"
+		extends="BaseResultMap">
+	</resultMap>
+
+	<!-- admin table all fields -->
+	<sql id="Base_Column_List">
+		id,login_name,name,password,status
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="com.sharehome.platform.model.Admin">
+		insert into admin(id,login_name,name,password,status)
+		values(#{id},#{loginName},#{name},#{password},#{status})
+	</insert>
+
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.sharehome.platform.model.Admin">
+		update admin set
+		login_name=#{loginName},name=#{name},password=#{password},status=#{status}
+		where id=#{id}
+	</update>
+
+	<!-- 根据Id查找记录 -->
+	<select id="selectById" resultMap="BaseResultMapBO"
+		parameterType="Integer">
+		select
+		<include refid="Base_Column_List" />
+		from admin where id = #{id}
+	</select>
+
+	
+	<!-- 管理员表列表 -->
+	<select id="listAdminByConditionsLimit" resultMap="BaseResultMapBO">
+		select <include refid="Base_Column_List" />
+        from admin
+        where status = 1 
+        <if test="admin.loginName !=null and admin.loginName !=''">
+	      and login_name=#{admin.loginName}
+		</if>
+		limit #{page.indexNo},#{page.numPerPage}
+	</select>
+	
+	<select id="listAdminByConditionsCount" resultType="Integer">
+		select count(*)
+		from admin
+        where status = 1 
+        <if test="admin.loginName !=null and admin.loginName !=''">
+	      and login_name=#{admin.loginName}
+		</if>
+	</select>
+	
+	<select id="getAdminByLoginName" resultMap="BaseResultMapBO">
+		select <include refid="Base_Column_List" /> 
+		from admin
+		where login_name=#{loginName} and status=1
+	</select>
+
+</mapper>   

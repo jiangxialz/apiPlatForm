@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="compile" name="apiPlatForm">
+	<property file="build.properties" />
+
+	<property name="appname" value="${ant.project.name}" />
+
+	<property name="build.compiler" value="modern" />
+
+	<property name="webapp" value="${basedir}" />
+
+	<property name="webapp.java" value="${webapp}/src" />
+
+	<property name="webapp.webroot" value="${webapp}/WebRoot" />
+	<property name="webapp.webroot.webinf" value="${webapp.webroot}/WEB-INF" />
+	<property name="webapp.lib" value="${webapp.webroot.webinf}/lib" />
+
+	<property name="webapp.build" value="${webapp}/build" />
+	<property name="webapp.build.docdir" value="${webapp.build}/docs/api" />
+	<property name="webapp.build.classesdir" value="${webapp.build}/classes" />
+	<property name="webapp.build.libpath" value="${webapp.lib}" />
+
+	<property name="webapp.assemble" value="${webapp}/assemble" />
+
+	<property name="app.destpath" value="${webapp.assemble}/app/" />
+	<property name="app.tarfile" value="${webapp.assemble}/${tar.name}" />
+	<property name="app.gzfile" value="${webapp.assemble}/${gz.name}" />
+	<property name="assemble.war" value="${webapp.assemble}/war" />
+
+	<property name="webapp.release_note" value="${webapp}/release_note.txt" />
+
+	<tstamp>
+		<format property="date" pattern="yyyy-MM-dd HH:mm" />
+	</tstamp>
+
+	<path id="build.classpath">
+		<fileset dir="${webapp.build.libpath}">
+			<include name="**/*.jar" />
+		</fileset>
+		<pathelement path="${webapp.build.classesdir}" />
+	</path>
+	
+	<pathconvert property="manifest.classpath" pathsep=" ">
+		<path refid="build.classpath" />
+		<mapper>
+			<chainedmapper>
+				<flattenmapper />
+				<globmapper from="*.jar" to="lib/*.jar" />
+			</chainedmapper>
+		</mapper>
+	</pathconvert>
+
+	<!-- Application. -->
+	<target name="clean">
+		<delete dir="${webapp.build}" />
+		<delete dir="${webapp.assemble}" failonerror="off" />
+	</target>
+
+	<target name="compile" depends="clean">
+		<mkdir dir="${webapp.build.classesdir}" />
+		<javac encoding="utf-8" debug="on" deprecation="yes" destdir="${webapp.build.classesdir}" includes="**" optimize="on" srcdir="${webapp.java}">
+			<classpath refid="build.classpath" />
+		</javac>
+	</target>
+	
+	<!-- Make a war -->
+	<target name="war" depends="compile">
+		<delete verbose="true" deleteonexit="true" file="${webapp.assemble}/${war.name}" />
+		<mkdir dir="${webapp.assemble}" />
+
+		<war destfile="${webapp.assemble}/${war.name}" webxml="${webapp.webroot.webinf}/web.xml">
+			<fileset dir="${webapp.webroot}" excludes="WEB-INF/**" />
+
+			<lib dir="${webapp.lib}" />
+
+			<classes dir="${webapp.build.classesdir}">
+			</classes>
+
+			<classes dir="${webapp.java}">
+				<exclude name="/test/**" />
+				<include name="**/*.xml" />
+				<include name="**/*.properties" />
+			</classes>
+
+			<metainf file="${webapp.release_note}" />
+		</war>
+	</target>
+	
+	<target name="javadocs">
+		<delete dir="${webapp.build.docdir}" />
+		<mkdir dir="${webapp.build.docdir}" />
+		<javadoc author="true" bottom="Copyright sharehome.com Inc. All Rights Reserved." destdir="${webapp.build.docdir}" doctitle="${appname} API" packagenames="com.*" sourcepath="${webapp.java}" use="true" version="true" windowtitle="${appname} API" encoding="UTF-8">
+			<classpath refid="build.classpath" />
+		</javadoc>
+	</target>
+
+</project>
